@@ -240,7 +240,7 @@ namespace Hologram
 
             RhandCube = CreateHandCollider("Right Hand Collider", HandColliders.transform);
             LhandCube = CreateHandCollider("Left Hand Collider", HandColliders.transform);
-            UnityEngine.Object.DontDestroyOnLoad (HandColliders);
+            UnityEngine.Object.DontDestroyOnLoad(HandColliders);
         }
 
         private GameObject CreateHandCollider(string name, Transform parent)
@@ -382,37 +382,39 @@ namespace Hologram
             int targetCount = model.Length;
             float waitTime = 1.5f / Mathf.Abs(targetCount - currentCount);
 
+            PrimitiveType shapeType;
+            switch (CurrentShape)
+            {
+                case 0:
+                    shapeType = PrimitiveType.Cube;
+                    break;
+                case 1:
+                    shapeType = PrimitiveType.Sphere;
+                    break;
+                default:
+                    shapeType = PrimitiveType.Cube;
+                    break;
+            }
+
             if (currentCount < targetCount)
             {
                 for (int i = currentCount; i < targetCount; i++)
                 {
-                    PrimitiveType shapeType;
-                    switch (CurrentShape)
-                    {
-                        case 0:
-                            shapeType = PrimitiveType.Cube; 
-                            break;
-                        case 1:
-                            shapeType = PrimitiveType.Sphere;
-                            break;
-                        default:
-                            shapeType = PrimitiveType.Cube;
-                            break;
-                    }
-                    GameObject cube = GameObject.CreatePrimitive(shapeType);
-                    cube.transform.localPosition = RhandTransform.position;
-                    cube.transform.parent = cubeParent.transform;
+                    if (currentScene != "Gym") { break; }
+                        GameObject cube = GameObject.CreatePrimitive(shapeType);
+                        cube.transform.localPosition = RhandTransform.position;
+                        cube.transform.parent = cubeParent.transform;
 
-                    cube.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
+                        cube.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
 
-                    Renderer renderer = cube.GetComponent<Renderer>();
-                    renderer.material = material;
+                        Renderer renderer = cube.GetComponent<Renderer>();
+                        renderer.material = material;
 
-                    Rigidbody rb = cube.AddComponent<Rigidbody>();
-                    rb.isKinematic = true;
+                        Rigidbody rb = cube.AddComponent<Rigidbody>();
+                        rb.isKinematic = true;
 
-                    cubeGrid.Add(cube);
-                    yield return new WaitForSeconds(waitTime);
+                        cubeGrid.Add(cube);
+                        yield return new WaitForSeconds(waitTime);
                 }
             }
             else if (currentCount > targetCount)
