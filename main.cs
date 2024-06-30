@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using RumbleModUI;
 using System;
+using static RumbleModdingAPI.Calls;
 
 namespace Hologram
 {
@@ -102,6 +103,12 @@ namespace Hologram
                 else
                 {
                     MainParent.active = true;
+                    if (LhandTransform == null || RhandTransform == null)
+                    {
+                        player = Calls.Players.GetLocalPlayer().Controller.gameObject.transform.GetChild(1).gameObject;
+                        RhandTransform = player.transform.GetChild(2);
+                        LhandTransform = player.transform.GetChild(1);
+                    }
                 }
             }
             else if (init)
@@ -430,26 +437,12 @@ namespace Hologram
 
         public override void OnUpdate()
         {
-            if (init && (bool)Hologram.Settings[2].SavedValue && (currentScene == "Gym" || currentScene == "Park"))
+            if (init && (bool)Hologram.Settings[2].SavedValue && currentScene == "Gym")
             {
-                if (currentScene == "Park")
-                {
-                    MainParent.transform.position = new Vector3(-27.3129f, -4.6836f, 11.0182f);
-                    MainParent.transform.rotation = Quaternion.Euler(-0f, 352.7455f, 0f);
-                } else if (currentScene == "Gym")
-                {
-
-                }
-                if (LhandTransform == null || RhandTransform == null)
-                {
-                    player = Calls.Players.GetLocalPlayer().Controller.gameObject.transform.GetChild(1).gameObject;
-                    RhandTransform = player.transform.GetChild(2);
-                    LhandTransform = player.transform.GetChild(1);
-                }
                 UpdateHandPositions();
                 UpdateCubeGrid();
                 UpdateNoisePositions();
-            }  
+            }
         }
 
         private void UpdateHandPositions()
