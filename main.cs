@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.IO;
 using RumbleModUI;
 using System;
-using static RumbleModdingAPI.Calls;
 
 namespace Hologram
 {
     public class main : MelonMod
     {
         private bool init = false;
+        private bool setPos = false;
         private string currentScene = "Loader";
         private int sceneCount = 0;
         private bool sceneChanged = false;
@@ -22,7 +22,7 @@ namespace Hologram
 
         public List<Vector3[]> ModelsList = new List<Vector3[]>();
 
-        private Material material;
+        private GameObject materialHolder;
 
         private GameObject player;
         private Transform RhandTransform;
@@ -79,42 +79,45 @@ namespace Hologram
 
         public void Save()
         {
-            if (currentScene == "Gym")
+            if (currentScene == "Gym" || currentScene == "Park")
             {
-                if ((bool)Hologram.Settings[2].SavedValue)
-                {
-                    MainParent.active = true;
-                }
-                else
-                {
-                    MainParent.active = false;
-                }
+                MainParent.SetActive((bool)Hologram.Settings[2].SavedValue);
             }
         }
 
         public void OnMapInitialized()
         {
-            if (currentScene == "Gym")
+            if (currentScene == "Gym" || currentScene == "Park")
             {
                 if (!init)
                 {
                     MelonCoroutines.Start(InitializeWithPause(sceneCount));
+                    MainParent.SetActive((bool)Hologram.Settings[2].SavedValue);
                 }
                 else
                 {
-                    MainParent.active = true;
+                    MainParent.SetActive((bool)Hologram.Settings[2].SavedValue);
+
                     if (LhandTransform == null || RhandTransform == null)
                     {
                         player = Calls.Players.GetLocalPlayer().Controller.gameObject.transform.GetChild(1).gameObject;
                         RhandTransform = player.transform.GetChild(2);
                         LhandTransform = player.transform.GetChild(1);
                     }
+
+                    MainParent.transform.position = currentScene == "Gym"
+                        ? new Vector3(3.92f, 1.2909f, -3.1745f)
+                        : new Vector3(-26.3655f, -4.4727f, 9.1037f);
                 }
             }
             else if (init)
             {
-                MainParent.active = false;
+                MainParent.SetActive(false);
+            } else
+            {
+                MelonLogger.Error("What the fuck did you do");
             }
+
         }
 
         private IEnumerator InitializeWithPause(int sceneNumber)
@@ -123,7 +126,7 @@ namespace Hologram
             DateTime targetTime = now.AddSeconds(1.0);
             while (DateTime.Now < targetTime)
             {
-                yield return (object)new WaitForFixedUpdate();
+                yield return new WaitForFixedUpdate();
             }
             if (sceneNumber == sceneCount)
             {
@@ -152,8 +155,8 @@ namespace Hologram
 
                 InitializeModels();
                 InitializePlayer();
-                InitializeHandColliders();
-                InitializeCubeGrid();
+            InitializeCubeGrid();
+            InitializeHandColliders();
 
                 init = true;
         }
@@ -251,7 +254,7 @@ namespace Hologram
             handCube.transform.parent = parent;
 
             Renderer renderer = handCube.GetComponent<Renderer>();
-            renderer.material = Calls.Gym.GetGymPoseGhostHandler().poseGhost.transform.GetChild(0).GetChild(1).GetComponent<Renderer>().material;
+            renderer.material = materialHolder.GetComponent<MeshRenderer>().material;
             renderer.enabled = false;
 
             Rigidbody rb = handCube.AddComponent<Rigidbody>();
@@ -266,7 +269,13 @@ namespace Hologram
             cubeParent = new GameObject("CubeGridParent");
             cubeParent.transform.parent = MainParent.transform;
 
-            material = Calls.Gym.GetGymPoseGhostHandler().poseGhost.transform.GetChild(0).GetChild(1).GetComponent<Renderer>().material;
+            Material material = Calls.Gym.GetGymPoseGhostHandler().poseGhost.transform.GetChild(0).GetChild(1).GetComponent<Renderer>().material;
+
+            materialHolder = new GameObject("Pose Ghost Material");
+            MeshRenderer materialRenderer = materialHolder.AddComponent<MeshRenderer>();
+            materialRenderer.material = material;
+            UnityEngine.Object.DontDestroyOnLoad(materialHolder);
+            materialHolder.transform.parent = MainParent.transform;
 
             CreateCubeGrid(ModelsList[0], material);
 
@@ -357,7 +366,7 @@ namespace Hologram
                 cube.transform.localScale = new Vector3(scale, scale, scale);
 
                 Renderer renderer = cube.GetComponent<Renderer>();
-                renderer.material = material;
+                renderer.material = materialHolder.GetComponent<MeshRenderer>().material;
 
                 Rigidbody rb = cube.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
@@ -400,7 +409,8 @@ namespace Hologram
             {
                 for (int i = currentCount; i < targetCount; i++)
                 {
-                    if (currentScene != "Gym") { break; }
+                    if (currentScene == "Gym" || currentScene == "Park")
+                    {
                         GameObject cube = GameObject.CreatePrimitive(shapeType);
                         cube.transform.localPosition = RhandTransform.position;
                         cube.transform.parent = cubeParent.transform;
@@ -408,13 +418,17 @@ namespace Hologram
                         cube.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
 
                         Renderer renderer = cube.GetComponent<Renderer>();
-                        renderer.material = material;
+                        renderer.material = materialHolder.GetComponent<MeshRenderer>().material;
 
                         Rigidbody rb = cube.AddComponent<Rigidbody>();
                         rb.isKinematic = true;
 
                         cubeGrid.Add(cube);
                         yield return new WaitForSeconds(waitTime);
+                    } else
+                    {
+                        break;
+                    }
                 }
             }
             else if (currentCount > targetCount)
@@ -439,11 +453,17 @@ namespace Hologram
 
         public override void OnUpdate()
         {
-            if (init && (bool)Hologram.Settings[2].SavedValue && currentScene == "Gym")
+            if (init && (bool)Hologram.Settings[2].SavedValue && (currentScene == "Gym" || currentScene == "Park"))
             {
-                UpdateHandPositions();
-                UpdateCubeGrid();
-                UpdateNoisePositions();
+                if (LhandCube != null && RhandCube != null && RhandTransform != null && LhandTransform != null)
+                {
+                    UpdateHandPositions();
+                    UpdateCubeGrid();
+                }
+                if (CurrentModel == ModelsList.Count)
+                {
+                    UpdateNoisePositions();
+                }
             }
         }
 
