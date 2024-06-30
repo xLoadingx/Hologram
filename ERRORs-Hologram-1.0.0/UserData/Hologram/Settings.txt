@@ -1,0 +1,4 @@
+Hologram 1.2.1
+Created by: ModUI 2.1.1
+Follow Hands (Move): false
+Toggle Hologram: true

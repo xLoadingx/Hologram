@@ -1,0 +1,10 @@
+{
+  "name": "Hologram",
+  "version_number": "1.2.4",
+  "website_url": "",
+  "description": "A hologram made of spheres that renders 3D models",
+  "dependencies": [
+	"UlvakSkillz-RumbleModdingAPI-3.0.1",
+	"Baumritter-RumbleModUI-2.1.1"
+  ]
+}

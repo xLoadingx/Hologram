@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hologram", "Hologram.csproj", "{CD7F7784-5CCE-4D6F-BBD7-0DF0DD9D040B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD7F7784-5CCE-4D6F-BBD7-0DF0DD9D040B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD7F7784-5CCE-4D6F-BBD7-0DF0DD9D040B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD7F7784-5CCE-4D6F-BBD7-0DF0DD9D040B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD7F7784-5CCE-4D6F-BBD7-0DF0DD9D040B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA79369D-3C56-48CA-925E-E6629C94137B}
+	EndGlobalSection
+EndGlobal
